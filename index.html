@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lipid Profile & Phase Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0"></script>
+    <style>
+        body { font-family: -apple-system, sans-serif; padding: 20px; max-width: 1100px; margin: auto; background: #f4f4f9; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; width: 100%; box-sizing: border-box; font-size: 14px; }
+        label { font-weight: bold; font-size: 0.8em; color: #444; margin-bottom: 5px; display: block; }
+        button { background: #007bff; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 20px; font-weight: bold; }
+        .chart-container { height: 600px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: #e9ecef; }
+        .hint { font-size: 0.75em; color: #888; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Blood Work Entry</h2>
+        <div class="grid">
+            <div><label>Date</label><input type="date" id="date"></div>
+            <div><label>Total CHOL</label><input type="number" id="chol"></div>
+            <div><label>LDL-D</label><input type="number" id="ldl"></div>
+            <div><label>Triglycerides</label><input type="number" id="trig"></div>
+            <div><label>HDL</label><input type="number" id="hdl"></div>
+            <div>
+                <label>Medication/Regime</label>
+                <input type="text" id="meds" placeholder="e.g. Lipitor 20mg">
+                <div class="hint">Leave blank to keep current regime</div>
+            </div>
+        </div>
+        <button onclick="addData()">Save Entry</button>
+    </div>
+
+    <div class="card chart-container">
+        <canvas id="lipidChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>History</h3>
+        <table id="historyTable">
+            <thead>
+                <tr><th>Date</th><th>CHOL</th><th>LDL-D</th><th>TRIG</th><th>HDL</th><th>Regime</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button onclick="clearData()" style="background:#ff4d4d; width: auto; margin-top: 30px;">Reset All Data</button>
+    </div>
+
+    <script>
+        let myData = JSON.parse(localStorage.getItem('lipidLogsV5')) || [];
+
+        function addData() {
+            let medsInput = document.getElementById('meds').value.trim();
+            
+            // If empty, look at the last entry and copy its medication
+            if (medsInput === "" && myData.length > 0) {
+                medsInput = myData[myData.length - 1].meds;
+            } else if (medsInput === "") {
+                medsInput = "Baseline"; // Default for the very first entry if left blank
+            }
+
+            const entry = {
+                date: document.getElementById('date').value,
+                chol: parseInt(document.getElementById('chol').value),
+                ldl: parseInt(document.getElementById('ldl').value),
+                trig: parseInt(document.getElementById('trig').value),
+                hdl: parseInt(document.getElementById('hdl').value),
+                meds: medsInput
+            };
+
+            if(!entry.date || isNaN(entry.chol)) return alert("Please enter at least the Date and Total Cholesterol.");
+
+            myData.push(entry);
+            myData.sort((a, b)
