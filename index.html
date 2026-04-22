@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lipid Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; background-color: #f8f9fa; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; }
+        .chart-container { margin-bottom: 40px; position: relative; height: 40vh; width: 100%; }
+        .info-box { background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 5px solid #2196f3; margin-top: 20px; }
+        .phase-label { font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛡️ Lipid & Medication Tracker</h1>
+    
+    <div class="info-box">
+        <strong>Current Regimen:</strong> Rosu 40 (Dinner) + Nustendi (Lunch). <br>
+        <em>Observation: LDL remains elevated at 125 with split-dosing.</em>
+    </div>
+
+    <h3>LDL, Triglycerides & Total Cholesterol</h3>
+    <div class="chart-container">
+        <canvas id="mainChart"></canvas>
+    </div>
+
+    <h3>HDL (Good Cholesterol)</h3>
+    <div class="chart-container">
+        <canvas id="hdlChart"></canvas>
+    </div>
+</div>
+
+<script>
+    const dates = ['05/24', '12/24', '01/25', '06/25', '09/25', '02/26'];
+    
+    // Main Chart: LDL, TRIG, CHOL
+    new Chart(document.getElementById('mainChart'), {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                { label: 'LDL (Bad)', data: [291, 188, 96, 96, 124, 125], borderColor: '#e74c3c', backgroundColor: '#e74c3c', tension: 0.2, borderWidth: 3 },
+                { label: 'Triglycerides', data: [254, 234, 170, 217, 275, 225], borderColor: '#8e44ad', backgroundColor: '#8e44ad', tension: 0.2, borderDash: [5, 5] },
+                { label: 'Total Chol', data: [385, 248, 151, 151, 195, 183], borderColor: '#f39c12', backgroundColor: '#f39c12', tension: 0.2 }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } },
+            plugins: {
+                autocolors: false,
+                annotation: { /* We can add shaded blocks here later */ }
+            }
+        }
+    });
+
+    // HDL Chart
+    new Chart(document.getElementById('hdlChart'), {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'HDL (Good)',
+                data: [28, 27, 18, 23, 17, 18],
+                borderColor: '#27ae60',
+                backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                fill: true,
+                tension: 0.2,
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { min: 0, max: 50 } }
+        }
+    });
+</script>
+</body>
+</html>
